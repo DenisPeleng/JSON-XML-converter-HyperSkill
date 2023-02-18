@@ -1,0 +1,5 @@
+# Project exclude paths
+/.gradle/
+/JSON - XML converter/task/build/
+/JSON - XML converter/task/out/
+/JSON - XML converter/task/out/production/classes/
