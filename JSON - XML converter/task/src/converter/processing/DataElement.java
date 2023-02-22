@@ -6,6 +6,7 @@ import java.util.List;
 public class DataElement {
     private final String name;
     private final String value;
+    private String path;
     private final List<DataElement> attributes;
 
     public DataElement(String name, String value, List<DataElement> attribute) {
@@ -40,6 +41,10 @@ public class DataElement {
         this.attributes = new ArrayList<>();
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public String getName() {
         return name;
     }
@@ -58,5 +63,22 @@ public class DataElement {
 
     public boolean hasValue() {
         return !value.isBlank();
+    }
+
+    public void printDataElementDescription() {
+        System.out.println("Element:");
+        System.out.printf("path = %s\n", path);
+        if (!value.startsWith("<")) {
+            System.out.printf("value = \"%s\"", value);
+        }
+        if (!attributes.isEmpty()) {
+            System.out.println("\nattributes:");
+            for (DataElement tmpAttr : attributes
+            ) {
+                System.out.printf("%s = %s\n", tmpAttr.getName(), tmpAttr.getValue());
+            }
+        }
+
+        System.out.println();
     }
 }

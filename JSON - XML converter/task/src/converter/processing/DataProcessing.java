@@ -1,16 +1,20 @@
 package converter.processing;
 
-public abstract class DataProcessing {
-    public String dataElementToStr(DataElement dataElement) {
+import java.util.List;
+
+public interface DataProcessing {
+    default String dataElementToStr(DataElement dataElement) {
         if (dataElement.hasAttributes()) {
             return dataElementWithAttributesToStr(dataElement);
         } else return dataElementWithValueOnlyToStr(dataElement);
     }
 
-    protected abstract String dataElementWithValueOnlyToStr(DataElement dataElement);
+   String dataElementWithValueOnlyToStr(DataElement dataElement);
 
-    protected abstract String dataElementWithAttributesToStr(DataElement dataElement);
+   String dataElementWithAttributesToStr(DataElement dataElement);
 
-    public abstract DataElement strTodataElement(String str);
+    DataElement strTagTodataElement(String str);
+
+    List<DataElement> parseAllDataElement(String str);
 }
 

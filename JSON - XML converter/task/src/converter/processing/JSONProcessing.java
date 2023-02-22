@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class JSONProcessing extends DataProcessing {
-    public DataElement strTodataElement(String str) {
+public class JSONProcessing implements DataProcessing {
+    public DataElement strTagTodataElement(String str) {
         List<DataElement> listAttributes = new ArrayList<>();
         String firstValues = getValueInsideBrackets(str);
         String name = firstValues.substring(0, firstValues.indexOf(":")).replace("\"", "").trim();
@@ -32,6 +32,11 @@ public class JSONProcessing extends DataProcessing {
         }
     }
 
+    @Override
+    public List<DataElement> parseAllDataElement(String str) {
+        return null;
+    }
+
     private String getValueInsideBrackets(String stringInput) {
         Pattern patternInsideBrackets = Pattern.compile("(?<=\\{).*(?=})");
         Matcher matcherInsideBrackets = patternInsideBrackets.matcher(stringInput);
@@ -41,7 +46,7 @@ public class JSONProcessing extends DataProcessing {
         return "";
     }
 
-    protected String dataElementWithAttributesToStr(DataElement dataElement) {
+    public String dataElementWithAttributesToStr(DataElement dataElement) {
         StringBuilder result = new StringBuilder();
         result.append("{\n");
         result.append(String.format("\t\"%s\" : ", dataElement.getName()));
@@ -63,7 +68,7 @@ public class JSONProcessing extends DataProcessing {
         return result.toString();
     }
 
-    protected String dataElementWithValueOnlyToStr(DataElement dataElement) {
+    public String dataElementWithValueOnlyToStr(DataElement dataElement) {
         StringBuilder result = new StringBuilder();
         result.append("{");
         result.append(String.format("\"%s\"", dataElement.getName()));

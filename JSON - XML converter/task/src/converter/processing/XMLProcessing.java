@@ -1,14 +1,18 @@
 package converter.processing;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class XMLProcessing extends DataProcessing {
-    public DataElement strTodataElement(String stringInput) {
+public class XMLProcessing implements DataProcessing {
+    private final List<DataElement> resultDataElements = new ArrayList<>();
+    private final LinkedHashMap<String, String> tagsWithPath = new LinkedHashMap<>();
+
+    public DataElement strTagTodataElement(String stringInput) {
         Pattern patternTag = Pattern.compile("<.*?>");
-        Pattern patternValueBetween = Pattern.compile("(?<=>).*?(?=<)");
+        Pattern patternValueBetween = Pattern.compile("(?<=>).*(?=</)");
         Pattern patternAttributesTag = Pattern.compile("(?<=\\s).*?\".*?\"");
         Pattern patternElementName = Pattern.compile("(?<=<).*?(?=[ >])");
         Matcher matcherTagOpen = patternTag.matcher(stringInput);
@@ -45,7 +49,71 @@ public class XMLProcessing extends DataProcessing {
         } else return new DataElement(name, listAttributes);
     }
 
-    protected String dataElementWithAttributesToStr(DataElement dataElement) {
+    @Override
+    public List<DataElement> parseAllDataElement(String strInput) {
+        DataElement currentElement = strTagTodataElement(strInput);
+        String deepPath = currentElement.getName();
+        tagsWithPath.put(strInput, currentElement.getName());
+        checkInsideValue(currentElement, deepPath);
+        for (
+                String tag : tagsWithPath.keySet()
+        ) {
+            DataElement tagDataElement = strTagTodataElement(tag);
+            tagDataElement.setPath(tagsWithPath.get(tag));
+            resultDataElements.add(tagDataElement);
+        }
+        return resultDataElements;
+    }
+
+    private void checkInsideValue(DataElement dataElement, String deepPath) {
+        if (dataElement.getValue().startsWith("<")) {
+            String currentValue = dataElement.getValue();
+            Pattern patternNewTagName = Pattern.compile("(?<=<)[^/].*?(?=[ >])");
+            Matcher matcherNewTagName = patternNewTagName.matcher(currentValue);
+
+            while (matcherNewTagName.find()) {
+                String newTagName = matcherNewTagName.group();
+                Pattern newFullTag = Pattern.compile(String.format("<%s.*?\\/>", newTagName));
+                Matcher matcherFullTag = newFullTag.matcher(currentValue);
+                if (!hasOneTagProperty(currentValue)) {
+                    newFullTag = Pattern.compile(String.format("<%s.*?<\\/%s>", newTagName, newTagName));
+                    matcherFullTag = newFullTag.matcher(currentValue);
+                }
+                if (matcherFullTag.find()) {
+                    String currentTagOnly = matcherFullTag.group();
+                    DataElement tmpDataElement = parseCurrentTag(newTagName, currentTagOnly);
+                    String currentDeepPath = String.format("%s, %s", deepPath, newTagName);
+                    tagsWithPath.put(currentTagOnly, currentDeepPath);
+                    checkInsideValue(tmpDataElement, currentDeepPath);
+                    currentValue = currentValue.replaceFirst(currentTagOnly,"");
+                    matcherNewTagName = patternNewTagName.matcher(currentValue);
+                }
+
+
+            }
+        }
+    }
+
+    private boolean hasOneTagProperty(String strInput) {
+        Pattern patternTag = Pattern.compile("<.*?>");
+        Matcher matcherTagOpen = patternTag.matcher(strInput);
+        if (matcherTagOpen.find()) {
+            return matcherTagOpen.group().contains("/>");
+        }
+        return false;
+    }
+
+    private DataElement parseCurrentTag(String newTagName, String data) {
+        Pattern newFullTag = Pattern.compile(String.format("<%s.*?<\\/%s>", newTagName, newTagName));
+        Matcher matcherFullTag = newFullTag.matcher(data);
+        String valueTMP = "";
+        if (matcherFullTag.find()) {
+            valueTMP = matcherFullTag.group();
+        }
+        return strTagTodataElement(valueTMP);
+    }
+
+    public String dataElementWithAttributesToStr(DataElement dataElement) {
         StringBuilder result = new StringBuilder();
         result.append("<");
         result.append(dataElement.getName());
@@ -66,7 +134,7 @@ public class XMLProcessing extends DataProcessing {
         return result.toString();
     }
 
-    protected String dataElementWithValueOnlyToStr(DataElement dataElement) {
+    public String dataElementWithValueOnlyToStr(DataElement dataElement) {
         StringBuilder result = new StringBuilder();
         if (dataElement.getValue().equals("null")) {
             result.append(String.format("<%s/>", dataElement.getName()));
@@ -77,4 +145,5 @@ public class XMLProcessing extends DataProcessing {
         }
         return result.toString();
     }
+
 }

@@ -5,6 +5,7 @@ import converter.processing.JSONProcessing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -14,7 +15,7 @@ public class Main {
         DataProcessing dataProcessingInput = new JSONProcessing();
         DataProcessing dataProcessingOutput = new JSONProcessing();
         StringBuilder inputStr = new StringBuilder();
-        while (scanner.hasNextLine()){
+        while (scanner.hasNextLine()) {
             inputStr.append(scanner.nextLine().trim());
         }
         String input = inputStr.toString();
@@ -25,8 +26,10 @@ public class Main {
             dataProcessingInput = new JSONProcessing();
             dataProcessingOutput = new XMLProcessing();
         }
-        DataElement dataElement = dataProcessingInput.strTodataElement(input);
-        String result = dataProcessingOutput.dataElementToStr(dataElement);
-        System.out.println(result);
+        List<DataElement> dataElement = dataProcessingInput.parseAllDataElement(input);
+        for (DataElement tmpElement : dataElement
+        ) {
+            tmpElement.printDataElementDescription();
+        }
     }
 }
