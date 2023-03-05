@@ -13,8 +13,6 @@ public interface DataProcessing {
 
    String dataElementWithAttributesToStr(DataElement dataElement);
 
-    DataElement strTagTodataElement(String str);
-
     List<DataElement> parseAllDataElement(String str);
 }
 

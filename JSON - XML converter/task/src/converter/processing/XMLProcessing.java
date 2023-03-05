@@ -51,23 +51,22 @@ public class XMLProcessing implements DataProcessing {
 
     @Override
     public List<DataElement> parseAllDataElement(String strInput) {
-        DataElement currentElement = strTagTodataElement(strInput);
-        String deepPath = currentElement.getName();
-        tagsWithPath.put(strInput, currentElement.getName());
-        checkInsideValue(currentElement, deepPath);
+        checkInsideValue(strInput, "");
         for (
                 String tag : tagsWithPath.keySet()
         ) {
             DataElement tagDataElement = strTagTodataElement(tag);
             tagDataElement.setPath(tagsWithPath.get(tag));
+            if (tagDataElement.getValue().startsWith("<")) {
+                tagDataElement.setValue("");
+            }
             resultDataElements.add(tagDataElement);
         }
         return resultDataElements;
     }
 
-    private void checkInsideValue(DataElement dataElement, String deepPath) {
-        if (dataElement.getValue().startsWith("<")) {
-            String currentValue = dataElement.getValue();
+    private void checkInsideValue(String currentValue, String deepPath) {
+        if (currentValue.startsWith("<")) {
             Pattern patternNewTagName = Pattern.compile("(?<=<)[^/].*?(?=[ >])");
             Matcher matcherNewTagName = patternNewTagName.matcher(currentValue);
 
@@ -83,9 +82,12 @@ public class XMLProcessing implements DataProcessing {
                     String currentTagOnly = matcherFullTag.group();
                     DataElement tmpDataElement = parseCurrentTag(newTagName, currentTagOnly);
                     String currentDeepPath = String.format("%s, %s", deepPath, newTagName);
+                    if (deepPath.isEmpty()) {
+                        currentDeepPath = String.format("%s", newTagName);
+                    }
                     tagsWithPath.put(currentTagOnly, currentDeepPath);
-                    checkInsideValue(tmpDataElement, currentDeepPath);
-                    currentValue = currentValue.replaceFirst(currentTagOnly,"");
+                    checkInsideValue(tmpDataElement.getValue(), currentDeepPath);
+                    currentValue = currentValue.replaceFirst(currentTagOnly, "");
                     matcherNewTagName = patternNewTagName.matcher(currentValue);
                 }
 

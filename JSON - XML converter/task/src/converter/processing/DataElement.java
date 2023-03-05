@@ -5,17 +5,20 @@ import java.util.List;
 
 public class DataElement {
     private final String name;
-    private final String value;
+    private String value;
     private String path;
-    private final List<DataElement> attributes;
+    private boolean isInvalidAttr;
+    private boolean isJsonInside;
+    private List<DataElement> attributes;
 
     public DataElement(String name, String value, List<DataElement> attribute) {
         this.name = name;
-        if (value.equals("null")) {
-            this.value = "";
+        if (!value.equals("null") && !value.contains("\"")) {
+            this.value = String.format("\"%s\"", value);
         } else {
             this.value = value;
         }
+
         this.attributes = attribute;
     }
 
@@ -27,8 +30,8 @@ public class DataElement {
 
     DataElement(String name, String value) {
         this.name = name;
-        if (value.equals("null")) {
-            this.value = "";
+        if (!value.equals("null") && !value.contains("\"")) {
+            this.value = String.format("\"%s\"", value);
         } else {
             this.value = value;
         }
@@ -43,6 +46,19 @@ public class DataElement {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setValue(String value) {
+        if (!value.equals("null") && !value.contains("\"")) {
+            this.value = String.format("\"%s\"", value);
+        } else {
+            this.value = value;
+        }
+
+    }
+
+    public void setInvalidAttr(boolean invalidAttr) {
+        isInvalidAttr = invalidAttr;
     }
 
     public String getName() {
@@ -64,15 +80,14 @@ public class DataElement {
     public boolean hasValue() {
         return !value.isBlank();
     }
-
     public void printDataElementDescription() {
         System.out.println("Element:");
         System.out.printf("path = %s\n", path);
-        if (!value.startsWith("<")) {
-            System.out.printf("value = \"%s\"", value);
+        if (!isJsonInside()) {
+            System.out.printf("value = %s\n", value);
         }
         if (!attributes.isEmpty()) {
-            System.out.println("\nattributes:");
+            System.out.println("attributes:");
             for (DataElement tmpAttr : attributes
             ) {
                 System.out.printf("%s = %s\n", tmpAttr.getName(), tmpAttr.getValue());
@@ -80,5 +95,24 @@ public class DataElement {
         }
 
         System.out.println();
+    }
+    public boolean isInvalidAttr() {
+        return isInvalidAttr;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setAttributes(List<DataElement> attributes) {
+        this.attributes = attributes;
+    }
+
+    public boolean isJsonInside() {
+        return isJsonInside;
+    }
+
+    public void setJsonInside(boolean jsonInside) {
+        isJsonInside = jsonInside;
     }
 }
