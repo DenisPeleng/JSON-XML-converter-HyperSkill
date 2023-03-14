@@ -8,7 +8,6 @@ public class DataElement {
     private String value;
     private String path;
     private boolean isInvalidAttr;
-    private boolean isJsonInside;
     private List<DataElement> attributes;
 
     public DataElement(String name, String value, List<DataElement> attribute) {
@@ -28,7 +27,7 @@ public class DataElement {
         this.attributes = attribute;
     }
 
-    DataElement(String name, String value) {
+    public DataElement(String name, String value) {
         this.name = name;
         if (!value.equals("null") && !value.contains("\"")) {
             this.value = String.format("\"%s\"", value);
@@ -38,7 +37,7 @@ public class DataElement {
         this.attributes = new ArrayList<>();
     }
 
-    DataElement(String name) {
+    public DataElement(String name) {
         this.name = name;
         this.value = "";
         this.attributes = new ArrayList<>();
@@ -49,7 +48,9 @@ public class DataElement {
     }
 
     public void setValue(String value) {
-        if (!value.equals("null") && !value.contains("\"")) {
+        if (value == null) {
+            this.value = null;
+        } else if (!value.equals("null") && !value.contains("\"")) {
             this.value = String.format("\"%s\"", value);
         } else {
             this.value = value;
@@ -69,6 +70,10 @@ public class DataElement {
         return value;
     }
 
+    public String getValueWithoutBrackets() {
+        return value.replace("\"", "");
+    }
+
     public List<DataElement> getAttributes() {
         return attributes;
     }
@@ -78,12 +83,18 @@ public class DataElement {
     }
 
     public boolean hasValue() {
-        return !value.isBlank();
+        if (value == null) {
+            return false;
+        } else {
+            return !value.isBlank();
+        }
+
     }
+
     public void printDataElementDescription() {
         System.out.println("Element:");
         System.out.printf("path = %s\n", path);
-        if (!isJsonInside()) {
+        if (value != null) {
             System.out.printf("value = %s\n", value);
         }
         if (!attributes.isEmpty()) {
@@ -96,6 +107,7 @@ public class DataElement {
 
         System.out.println();
     }
+
     public boolean isInvalidAttr() {
         return isInvalidAttr;
     }
@@ -108,11 +120,4 @@ public class DataElement {
         this.attributes = attributes;
     }
 
-    public boolean isJsonInside() {
-        return isJsonInside;
-    }
-
-    public void setJsonInside(boolean jsonInside) {
-        isJsonInside = jsonInside;
-    }
 }

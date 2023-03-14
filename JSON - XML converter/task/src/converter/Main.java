@@ -1,7 +1,8 @@
 package converter;
 
 import converter.processing.*;
-import converter.processing.JSONProcessing;
+import converter.processing.json.JSONProcessing;
+import converter.processing.xml.XMLProcessing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,8 +13,8 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException {
         String path = "test.txt";
         Scanner scanner = new Scanner(new File(path));
-        DataProcessing dataProcessingInput = null;
-        DataProcessing dataProcessingOutput = null;
+        DataProcessing dataProcessingInput;
+        DataProcessing dataProcessingOutput;
         StringBuilder inputStr = new StringBuilder();
         while (scanner.hasNextLine()) {
             inputStr.append(scanner.nextLine().trim());
@@ -30,9 +31,7 @@ public class Main {
             return;
         }
         List<DataElement> dataElement = dataProcessingInput.parseAllDataElement(input);
-        for (DataElement tmpElement : dataElement
-        ) {
-            tmpElement.printDataElementDescription();
-        }
+        String result = dataProcessingOutput.allDataElementsToStr(dataElement);
+        System.out.println(result);
     }
 }
