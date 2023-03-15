@@ -86,7 +86,8 @@ public class DataElement {
         if (value == null) {
             return false;
         } else {
-            return !value.isBlank();
+            String tmpValue = value.replace("\"", "");
+            return !tmpValue.isBlank();
         }
 
     }

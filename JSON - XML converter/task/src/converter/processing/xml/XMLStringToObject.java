@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 
 public class XMLStringToObject {
     private static final LinkedHashMap<String, String> tagsWithPath = new LinkedHashMap<>();
-    static LinkedHashMap<String, String>  checkInsideValue(String currentValue, String deepPath) {
+
+    static LinkedHashMap<String, String> checkInsideValue(String currentValue, String deepPath) {
         if (currentValue.startsWith("<")) {
             Pattern patternNewTagName = Pattern.compile("(?<=<)[^/].*?(?=[ >])");
             Matcher matcherNewTagName = patternNewTagName.matcher(currentValue);
@@ -41,6 +42,7 @@ public class XMLStringToObject {
         }
         return tagsWithPath;
     }
+
     private static boolean hasOneTagProperty(String strInput) {
         Pattern patternTag = Pattern.compile("<.*?>");
         Matcher matcherTagOpen = patternTag.matcher(strInput);
@@ -59,6 +61,7 @@ public class XMLStringToObject {
         }
         return strTagTodataElement(valueTMP);
     }
+
     public static DataElement strTagTodataElement(String stringInput) {
         Pattern patternTag = Pattern.compile("<.*?>");
         Pattern patternValueBetween = Pattern.compile("(?<=>).*(?=</)");
@@ -92,7 +95,9 @@ public class XMLStringToObject {
                 }
             }
         }
-        if (matcherValueBetween.find()) {
+        if (stringInput.endsWith("/>")) {
+            return new DataElement(name, "null", listAttributes);
+        } else if (matcherValueBetween.find()) {
             value = matcherValueBetween.group();
             return new DataElement(name, value, listAttributes);
         } else return new DataElement(name, listAttributes);

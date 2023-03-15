@@ -67,7 +67,7 @@ public class ObjectToXMLString {
                 result.append(String.format(" %s=%s", tmpAttr.getName(), tmpAttr.getValue()));
             }
         }
-        if (!dataElement.hasValue() || dataElement.getValue().equals("null")) {
+        if (dataElement.getValue().equals("null")) {
             tagsValues.put(dataElement.getName(), " />");
             closeTags.push(dataElement.getName());
             return result.toString();

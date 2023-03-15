@@ -21,7 +21,7 @@ public class XMLProcessing implements DataProcessing {
             DataElement tagDataElement = strTagTodataElement(tag);
             tagDataElement.setPath(tagsWithPath.get(tag));
             if (tagDataElement.getValue().startsWith("<")) {
-                tagDataElement.setValue("");
+                tagDataElement.setInvalidAttr(true);
             }
             resultDataElements.add(tagDataElement);
         }
